@@ -1,0 +1,18 @@
+# Two independent containers, each with its own isolated store.db.
+# Run both:        docker compose up --build
+# Run just one:     docker compose up --build vulnerable
+#                    docker compose up --build secure
+services:
+  vulnerable:
+    build:
+      context: .
+      dockerfile: vulnerable/Dockerfile
+    ports:
+      - "5000:5000"
+
+  secure:
+    build:
+      context: .
+      dockerfile: secure/Dockerfile
+    ports:
+      - "5001:5001"
