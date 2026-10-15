@@ -18,11 +18,11 @@ DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "store.db")
 
 
 def build(weak_admin: bool):
-    if os.path.exists(DB_PATH):
-        os.remove(DB_PATH)
-
     con = sqlite3.connect(DB_PATH)
     cur = con.cursor()
+    cur.execute("DROP TABLE IF EXISTS products")
+    cur.execute("DROP TABLE IF EXISTS customers")
+    cur.execute("DROP TABLE IF EXISTS employees")
 
     cur.execute("""
         CREATE TABLE products (
@@ -72,10 +72,12 @@ def build(weak_admin: bool):
     )
 
     if weak_admin:
-        # VULNERABLE seed: trivially guessable admin credentials, plaintext storage
+        # VULNERABLE seed: 3 separate admin accounts with distinct common weak passwords
         employees = [
             ("floor_staff", "staff123", "employee", None, 0, None),
             ("admin", "admin123", "admin", None, 0, None),
+            ("store_admin", "password", "admin", None, 0, None),
+            ("manager_admin", "123456", "admin", None, 0, None),
         ]
         cur.executemany(
             "INSERT INTO employees (username, password, role, mfa_secret, failed_attempts, locked_until) "
